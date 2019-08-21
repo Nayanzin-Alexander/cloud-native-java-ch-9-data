@@ -1,0 +1,3 @@
+CREATE TABLE hello_world(
+  id BIGSERIAL PRIMARY KEY
+);
