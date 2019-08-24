@@ -24,5 +24,4 @@ public class Address {
     private Integer zipCode;
 
     private AddressType addressType;
-
 }

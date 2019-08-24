@@ -4,8 +4,12 @@ import com.nayanzin.address.Address;
 import com.nayanzin.data.BaseEntity;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +33,11 @@ public class Order extends BaseEntity {
     private Address shippingAddress;
 
     private List<LineItem> lineItems = new ArrayList<>();
+
+    private BigDecimal totalAmount;
+
+    @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
+    private Point coordinates;
 
     public boolean addLineItem(LineItem lineItem) {
         if (isNull(this.lineItems)) {
