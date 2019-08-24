@@ -14,12 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 @Document
 public class Order extends BaseEntity {
 
@@ -34,6 +35,7 @@ public class Order extends BaseEntity {
 
     private List<LineItem> lineItems = new ArrayList<>();
 
+    @EqualsAndHashCode.Exclude
     private BigDecimal totalAmount;
 
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
@@ -44,5 +46,10 @@ public class Order extends BaseEntity {
             this.lineItems = new ArrayList<>();
         }
         return this.lineItems.add(lineItem);
+    }
+
+    @EqualsAndHashCode.Include
+    public BigDecimal totalAmountForEqualsAndHashcode() {
+        return nonNull(totalAmount) ? totalAmount.stripTrailingZeros() : null;
     }
 }

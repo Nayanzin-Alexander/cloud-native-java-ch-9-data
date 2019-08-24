@@ -12,8 +12,12 @@ import java.util.Arrays;
 class OrderTestUtil {
 
     static Order getOrder() {
+        return getOrder("account_1");
+    }
+
+    static Order getOrder(String accountNumber) {
         return Order.builder()
-                .accountNumber("123456")
+                .accountNumber(accountNumber)
                 .orderStatus(OrderStatus.PENDING)
                 .shippingAddress(Address.builder()
                         .addressType(AddressType.SHIPPING)

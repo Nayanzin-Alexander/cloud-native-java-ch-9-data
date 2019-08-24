@@ -8,6 +8,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import java.math.BigDecimal;
 import java.util.List;
 
+// TODO combine this with mongoTemplate repository.
 public interface OrderRepository extends PagingAndSortingRepository<Order, String> {
 
     // Query methods.

@@ -3,11 +3,9 @@ package com.nayanzin.data;
 import org.joda.time.DateTime;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
-import org.springframework.stereotype.Component;
 
 import static java.util.Objects.isNull;
 
-@Component
 public class BeforeSaveListener extends AbstractMongoEventListener<BaseEntity> {
 
     @Override
