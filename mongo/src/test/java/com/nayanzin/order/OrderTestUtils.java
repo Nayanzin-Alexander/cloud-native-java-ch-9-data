@@ -2,16 +2,14 @@ package com.nayanzin.order;
 
 import com.nayanzin.address.Address;
 import com.nayanzin.address.AddressType;
-import org.junit.Ignore;
 import org.springframework.data.geo.Point;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 
-@Ignore
-class OrderTestUtil {
+public abstract class OrderTestUtils {
 
-    static Order getOrder() {
+    public static Order getOrder() {
         return getOrder("account_1");
     }
 

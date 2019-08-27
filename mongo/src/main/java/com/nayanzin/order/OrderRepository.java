@@ -8,8 +8,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import java.math.BigDecimal;
 import java.util.List;
 
-// TODO combine this with mongoTemplate repository.
-public interface OrderRepository extends PagingAndSortingRepository<Order, String> {
+public interface OrderRepository extends OrderMongoTemplateRepository, PagingAndSortingRepository<Order, String> {
 
     // Query methods.
     List<Order> findByAccountNumber(String accountNumber);

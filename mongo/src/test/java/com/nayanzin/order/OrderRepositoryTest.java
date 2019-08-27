@@ -1,51 +1,32 @@
 package com.nayanzin.order;
 
-import com.nayanzin.aggregation.AccountOrdersAggregation;
-import com.nayanzin.data.MongoConversionConfig;
-import com.nayanzin.data.MongoListenersConfig;
+import com.nayanzin.OrderApplicationTestConfig;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.*;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.nayanzin.order.OrderTestUtil.getOrder;
+import static com.nayanzin.order.OrderTestUtils.getOrder;
 import static java.math.BigDecimal.*;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
-import static org.springframework.data.domain.Sort.Direction.ASC;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
 
-@RunWith(SpringRunner.class)
-@DataMongoTest(excludeAutoConfiguration = EmbeddedMongoAutoConfiguration.class)
-@Import({MongoConversionConfig.class, MongoListenersConfig.class})
-public class OrderRepositoryTest {
+public class OrderRepositoryTest extends OrderApplicationTestConfig {
 
     @Autowired
     private OrderRepository orderRepository;
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
-
-    @Before
+    @Before @After
     public void preconditions() {
         // Remove previous orders.
         orderRepository.deleteAll();
@@ -106,8 +87,6 @@ public class OrderRepositoryTest {
         assertThat(foundOrder.getLineItems(), is(order.getLineItems()));
         assertThat(foundOrder.getTotalAmount(), is(order.getTotalAmount()));
         assertThat(foundOrder.getCoordinates(), is(order.getCoordinates()));
-        assertThat(foundOrder.getCreatedAt(), notNullValue());
-        assertThat(foundOrder.getLastModified(), notNullValue());
         assertThat(foundOrder, is(order));
 
         assertThat(foundOrder.getAccountNumber(), is(accountNumber));
@@ -152,12 +131,8 @@ public class OrderRepositoryTest {
 
     @Test
     public void mongoTemplateFindByAccountNumberTest() {
-        // Given find orders by account number query
-        Query query = new Query();
-        query.addCriteria(where("accountNumber").is("account_1"));
-
-        // When execute query.
-        List<Order> orders = mongoTemplate.find(query, Order.class);
+        // When find orders by account  number using mongo template.
+        List<Order> orders = orderRepository.mongoTemplateFindByAccountNumber("account_1");
 
         // Then orders return.
         assertThat(orders, hasSize(20));
@@ -165,16 +140,10 @@ public class OrderRepositoryTest {
 
     @Test
     public void projectionTest() {
-        // Given query with field excludes.
-        Query query = new Query();
-        query.fields()
-                .exclude("shippingAddress")
-                .exclude("lineItems");
+        // When get orders with excluded fields.
+        List<Order> orders = orderRepository.mongoTemplateFindWithExcludedFields("shippingAddress", "lineItems");
 
-        // When execute query.
-        List<Order> orders = mongoTemplate.find(query, Order.class);
-
-        // Then orders return.
+        // Then orders return with excluded fields.
         orders.forEach(order -> {
             assertThat(order.getShippingAddress(), is(nullValue()));
             assertThat(order.getLineItems(), hasSize(0));
@@ -195,48 +164,29 @@ public class OrderRepositoryTest {
                 .mapToObj(i -> getOrder("account_3"))
                 .collect(toList()));
 
-        // When get account total sum of pending orders using aggregateion.
-        MatchOperation matchByPendingStatus = Aggregation.match(new Criteria("orderStatus").is(OrderStatus.PENDING));
+        // When get account total sum of pending orders using aggregation.
+        List<AccountOrdersAggregation> results = orderRepository.mongoTemplateAggregateOrdersByAccountFilterByStatus(OrderStatus.PENDING);
 
-        GroupOperation groupByAccountNumber = Aggregation
-                .group("accountNumber")
-                .sum("totalAmount").as("accountTotalAmount")
-                .avg("totalAmount").as("accountAverageAmount");
 
-        SortOperation sort = Aggregation.sort(new Sort(ASC, "_id"));
-
-        Aggregation aggregation = Aggregation.newAggregation(
-                matchByPendingStatus,
-                groupByAccountNumber,
-                sort
-        );
-
-        AggregationResults<AccountOrdersAggregation> sortedResult = mongoTemplate.aggregate(aggregation, "order", AccountOrdersAggregation.class);
-
-        // Then valid result.
-        List<AccountOrdersAggregation> sortedAggregations = sortedResult.getMappedResults();
-        assertThat(sortedAggregations, hasSize(3));
+        // Then orders are grouped by account and total amounts and account average amounts are valid.
+        assertThat(results, hasSize(3));
 
         // First account order aggregation is correct.
-        AccountOrdersAggregation acc1 = sortedAggregations.get(0);
+        AccountOrdersAggregation acc1 = results.get(0);
         assertThat(acc1.getId(), is("account_1"));
         assertThat(acc1.getAccountTotalAmount(), is(closeTo(BigDecimal.valueOf(1382.0), ZERO)));
         assertThat(acc1.getAccountAverageAmount(), is(closeTo(BigDecimal.valueOf(69.1), ZERO)));
 
         // Second account order aggregation is correct.
-        AccountOrdersAggregation acc2 = sortedAggregations.get(1);
+        AccountOrdersAggregation acc2 = results.get(1);
         assertThat(acc2.getId(), is("account_2"));
         assertThat(acc2.getAccountTotalAmount(), is(closeTo(BigDecimal.valueOf(2073.0), ZERO)));
         assertThat(acc2.getAccountAverageAmount(), is(closeTo(BigDecimal.valueOf(69.1), ZERO)));
 
         // Third account order aggregation is correct.
-        AccountOrdersAggregation acc3 = sortedAggregations.get(2);
+        AccountOrdersAggregation acc3 = results.get(2);
         assertThat(acc3.getId(), is("account_3"));
         assertThat(acc3.getAccountTotalAmount(), is(closeTo(BigDecimal.valueOf(2764.0), ZERO)));
         assertThat(acc3.getAccountAverageAmount(), is(closeTo(BigDecimal.valueOf(69.1), ZERO)));
     }
-
-    // TODO create more sufficient aggregate and map-reduce cases.
-    // TODO how about to use Money API instead of using BigDecimal
-
 }

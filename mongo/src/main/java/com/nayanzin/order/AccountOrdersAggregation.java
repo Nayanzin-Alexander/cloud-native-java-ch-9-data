@@ -1,11 +1,11 @@
-package com.nayanzin.aggregation;
+package com.nayanzin.order;
 
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-public class AccountOrdersAggregation {
+class AccountOrdersAggregation {
 
     /**
      * Account number.
