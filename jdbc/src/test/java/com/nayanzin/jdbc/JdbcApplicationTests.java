@@ -1,28 +1,33 @@
 package com.nayanzin.jdbc;
 
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-
-import java.io.File;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles({"test"})
 public class JdbcApplicationTests {
 
-    @ClassRule
-    public static DockerComposeContainer env = new DockerComposeContainer(new File("src/test/resources/compose-test.yml"))
-                .withExposedService("postgres_1", 5432);
+    private static final GenericContainer POSTGRES_CONTAINER;
+
+    static {
+        POSTGRES_CONTAINER = new FixedHostPortGenericContainer("postgres")
+                .withFixedExposedPort(5433, 5432)
+                .withEnv("POSTGRES_USER", "test_user")
+                .withEnv("POSTGRES_PASSWORD", "test_password")
+                .withEnv("POSTGRES_DB", "test_db")
+                .waitingFor(Wait.forLogMessage(".*database system is ready to accept connections.*\\s", 1));
+        POSTGRES_CONTAINER.start();
+    }
 
     @Test
     public void contextLoads() {
-        System.out.println("Hello world");
-    }
 
+    }
 }

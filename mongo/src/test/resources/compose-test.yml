@@ -1,7 +1,0 @@
-version: '2'
-
-services:
-  test-mongo:
-    image: mongo
-    ports:
-      - 27018:27017
