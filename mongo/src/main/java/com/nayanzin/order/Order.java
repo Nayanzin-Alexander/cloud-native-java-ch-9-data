@@ -13,9 +13,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+@SuppressWarnings("DefaultAnnotationParam")
 @Data
 @Builder
 @NoArgsConstructor
@@ -41,13 +41,7 @@ public class Order extends BaseEntity {
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     private Point coordinates;
 
-    public boolean addLineItem(LineItem lineItem) {
-        if (isNull(this.lineItems)) {
-            this.lineItems = new ArrayList<>();
-        }
-        return this.lineItems.add(lineItem);
-    }
-
+    @SuppressWarnings("unused")
     @EqualsAndHashCode.Include
     public BigDecimal totalAmountForEqualsAndHashcode() {
         return nonNull(totalAmount) ? totalAmount.stripTrailingZeros() : null;

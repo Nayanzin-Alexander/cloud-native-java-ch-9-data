@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Document
-public class Invoice extends BaseEntity {
+class Invoice extends BaseEntity {
 
     @Id
     private String invoiceId;
@@ -28,9 +28,4 @@ public class Invoice extends BaseEntity {
     private Address billingAddress;
 
     private InvoiceStatus invoiceStatus;
-
-    public void addOrder(Order order) {
-        order.setAccountNumber(this.customerId);
-        orders.add(order);
-    }
 }

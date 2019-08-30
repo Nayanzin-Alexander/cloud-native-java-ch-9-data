@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 
 import static java.util.Objects.isNull;
 
-public class BeforeSaveListener extends AbstractMongoEventListener<BaseEntity> {
+class BeforeSaveListener extends AbstractMongoEventListener<BaseEntity> {
 
     @Override
     public void onBeforeSave(BeforeSaveEvent<BaseEntity> event) {

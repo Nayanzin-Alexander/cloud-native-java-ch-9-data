@@ -15,6 +15,8 @@ public interface OrderRepository extends OrderMongoTemplateRepository, PagingAnd
 
     List<Order> findByTotalAmountBetween(BigDecimal from, BigDecimal to);
 
+    @SuppressWarnings("SpringDataRepositoryMethodParametersInspection")
+    // https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/#mongodb.repositories.queries
     List<Order> findByCoordinatesNear(Point point, Distance distance);
 
     // MongoDB JSON-based Query Methods

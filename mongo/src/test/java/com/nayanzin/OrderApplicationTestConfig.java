@@ -15,11 +15,8 @@ import org.testcontainers.containers.GenericContainer;
 @Import({MongoConversionConfig.class, MongoListenersConfig.class})
 public abstract class OrderApplicationTestConfig {
 
-    /**
-     * https://www.testcontainers.org/test_framework_integration/manual_lifecycle_control/
-     */
+    // https://www.testcontainers.org/test_framework_integration/manual_lifecycle_control/
     private static final GenericContainer MONGO_CONTAINER;
-
     static {
         MONGO_CONTAINER = new FixedHostPortGenericContainer("mongo")
             .withFixedExposedPort(27018, 27017);

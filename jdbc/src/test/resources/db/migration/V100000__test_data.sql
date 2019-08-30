@@ -1,3 +1,5 @@
+-- noinspection SqlResolve
+
 INSERT INTO hello_world
 VALUES
 (1),

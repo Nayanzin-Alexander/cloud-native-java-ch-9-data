@@ -10,7 +10,7 @@ import static java.util.Objects.nonNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LineItem {
+class LineItem {
 
     private String name;
 
@@ -24,11 +24,13 @@ public class LineItem {
     @EqualsAndHashCode.Exclude
     private BigDecimal tax;
 
+    @SuppressWarnings("unused")
     @EqualsAndHashCode.Include
     public BigDecimal priceForEqualsAndHashcode() {
         return nonNull(price) ? price.stripTrailingZeros() : null;
     }
 
+    @SuppressWarnings("unused")
     @EqualsAndHashCode.Include
     public BigDecimal taxForEqualsAndHashcode() {
         return nonNull(tax) ? tax.stripTrailingZeros() : null;
