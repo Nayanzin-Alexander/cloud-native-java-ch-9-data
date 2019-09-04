@@ -22,7 +22,6 @@ import static javax.persistence.GenerationType.IDENTITY;
 @AllArgsConstructor
 class User implements Serializable {
 
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @Column(name = "id")
