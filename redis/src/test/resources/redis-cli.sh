@@ -1,13 +1,3 @@
-# Connect to Redis Command Line Interface.
-redis-cli
-
-# Read config parameters CONFIG GET ${parameter_name}. * - all parameters.
-CONFIG GET *
-CONFIG GET loglevel
-
-# Set config parameter CONFIG SET ${parameter_name} ${parameter_value}
-CONFIG SET loglevel "notice"
-
 ############################################
 ## Data types and abstractions
 ############################################
@@ -94,6 +84,3 @@ SCAN cursor [MATCH pattern] [COUNT count]
 SSCAN key cursor [MATCH pattern] [COUNT count]
 HSCAN key cursor [MATCH pattern] [COUNT count]
 ZSCAN key cursor [MATCH pattern] [COUNT count]
-
-# Lua scripts
-
